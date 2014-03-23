@@ -21,6 +21,7 @@ SlotPlayerListner solPlayerListner = new SlotPlayerListner(plugin);
     public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args){
 			if(commandLabel.equalsIgnoreCase("Casino")){
 				Player p = (Player) sender;
+				if(p.hasPermission("Cassino.Commands")){
 				if(args.length!=0){
 					if(args[0].equalsIgnoreCase("SlotMachine")||args[0].equalsIgnoreCase("SlotMachines")||args[0].equalsIgnoreCase("SM")){
 					p.sendMessage(""+ChatColor.YELLOW+"Slot Machine:\n"
@@ -35,6 +36,7 @@ SlotPlayerListner solPlayerListner = new SlotPlayerListner(plugin);
 							+ "/Cassino SlotMachines");
 				}
 			}
+		}
 			return false;
 	}
 }

@@ -22,6 +22,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.Lever;
@@ -43,7 +44,19 @@ public class SlotPlayerListner implements Listener{
 		}
 	}
 
-
+	@EventHandler
+	public void OnSignPlace(SignChangeEvent e){
+			if(e.getLine(1).equalsIgnoreCase("SlotMachine")||e.getLine(1).equalsIgnoreCase(ChatColor.DARK_GREEN+"SlotMachine")){
+				if(e.getPlayer().hasPermission("Casino.SlotMachine.Place")){
+				e.setLine(1, ChatColor.DARK_GREEN+"SlotMachine");
+					if(e.getLine(2).equals(".*\\d.*")){
+						e.setLine(2, "Bet: "+plugin.getConfig().getConfigurationSection("BetAmounts").getInt("Bet1"));
+					}
+				}else{
+					e.setLine(1, "SlotMachine");
+				}
+			}
+	}
 	@EventHandler
 	public void OnInteract(final PlayerInteractEvent e){
         if(e.hasBlock()){
