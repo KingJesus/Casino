@@ -1,0 +1,61 @@
+#WinPercent: The chance of wining (How loose the slots are), Setting this over %100 doesn't work everytime
+#BetAmounts: Sets the amounts that you can bet
+#Please set all 6 items
+#Item:
+#  ItemType: sets the item Material
+#  ItemPayout: sets the payout amount ie. 10x (Don't set to 0, Insted set the rate to 0)
+#  Rate: Does not effect the overall WinPercent but sets how likely you'll hit that one reel (Lowers the
+#  	chances for others if risen and vice versa). It is Highly recomended that the higher your payout
+#	lower you set your rate
+#  Jackpot: Announces to the whole server What and how much a player won
+BetAmounts:
+ NumberofBets: 3
+ Bet1: 5
+ Bet2: 10
+ Bet3: 25
+ Bet4: 100
+ Bet5: 200
+WinPercent: 100
+NumberofSlots: 6
+Item1:
+
+  ItemType: DIAMOND
+  ItemPayout: 100
+  Rate: 0.1
+  Jackpot: true
+Item2:
+
+  ItemType: EMERALD
+  ItemPayout: 20
+  Rate: 0.35
+  Jackpot: false
+Item3:
+
+  ItemType: GOLD_INGOT
+  ItemPayout: 10
+  Rate: 0.8
+  Jackpot: false
+Item4:
+
+  ItemType: IRON_INGOT
+  ItemPayout: 5
+  Rate: 1
+  Jackpot: false
+Item5:
+
+  ItemType: REDSTONE
+  ItemPayout: 3
+  Rate: 1.5
+  Jackpot: false
+Item6:
+
+  ItemType: COAL
+  ItemPayout: 2
+  Rate: 3
+  Jackpot: false
+Item7:
+
+  ItemType: APPLE
+  ItemPayout: 1
+  Rate: 3
+  Jackpot: false
