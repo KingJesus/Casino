@@ -9,13 +9,13 @@
 #	lower you set your rate
 #  Jackpot: Announces to the whole server What and how much a player won
 BetAmounts:
- NumberofBets: 3
+ NumberofBets: 4
  Bet1: 5
  Bet2: 10
  Bet3: 25
  Bet4: 100
  Bet5: 200
-WinPercent: 100
+WinPercent: 92
 NumberofSlots: 6
 Item1:
 

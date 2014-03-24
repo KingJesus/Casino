@@ -52,6 +52,7 @@ public class CasinoMain extends JavaPlugin implements Listener{
 	    }
 	    //--Vault--
 	    //SlotMachine
+	    //Gets the % chance for each item to win and puts it in the array
 		public double[] getRate(){
 			int NumberofReels = getConfig().getInt("NumberofSlots");
 			double[] ItemHitChance=new double[NumberofReels];

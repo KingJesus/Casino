@@ -169,7 +169,7 @@ public class SlotPlayerListner implements Listener{
 										   }
 									   }
 								  }}, (-30*Fy)+122);
-							  
+							  //Fires the events at 92 47 32
 						  }
 					  	  }
 				 		  }
