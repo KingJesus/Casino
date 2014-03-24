@@ -30,7 +30,7 @@ public class CasinoMain extends JavaPlugin implements Listener{
 	public void onDisable(){
 		getServer().getScheduler().cancelTasks(this);
 	}
-	//Vault
+	//--Vault--
 	 public static Economy econ = null;
 	    private boolean setupEconomy() {
 	        if (getServer().getPluginManager().getPlugin("Vault") == null) {
@@ -50,6 +50,7 @@ public class CasinoMain extends JavaPlugin implements Listener{
 	        perms = rsp.getProvider();
 	        return perms != null;
 	    }
+	    //--Vault--
 	    //SlotMachine
 		public double[] getRate(){
 			int NumberofReels = getConfig().getInt("NumberofSlots");

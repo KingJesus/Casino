@@ -32,11 +32,12 @@ SlotPlayerListner solPlayerListner = new SlotPlayerListner(plugin);
 					}
 					}
 				}else{
-					p.sendMessage("Commands:\n"
+					p.sendMessage(ChatColor.DARK_GREEN+"Commands:\n"+ChatColor.WHITE
 							+ "/Cassino SlotMachines");
 				}
 			}
 		}
 			return false;
-	}
+
+}
 }
