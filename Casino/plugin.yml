@@ -5,6 +5,4 @@ description: >
              Casino Plugin
 commands:
   Casino:
-    description: Version 0.1
-  C:
-  
+    description: Version 0.1.1
