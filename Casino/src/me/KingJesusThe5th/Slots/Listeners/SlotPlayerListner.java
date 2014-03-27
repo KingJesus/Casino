@@ -105,7 +105,7 @@ public class SlotPlayerListner implements Listener{
 		for(int x=1;bm.getPageCount()>x;x++){
 			String[] lines = bm.getPage(x).split("\n");
 			for(String l:lines){
-				if(l.startsWith("Type:")){
+				if(l.startsWith("Bet: ")){
 					StringCounter++;
 				}
 			}
@@ -322,6 +322,7 @@ public class SlotPlayerListner implements Listener{
         }
         }
         }
+        
         //End of event
 	}
 }
