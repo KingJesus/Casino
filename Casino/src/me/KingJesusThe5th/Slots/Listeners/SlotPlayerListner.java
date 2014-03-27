@@ -2,13 +2,16 @@ package me.KingJesusThe5th.Slots.Listeners;
 
 
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Random;
 
 import me.KingJesusThe5th.Main.CasinoMain;
 import net.milkbowl.vault.economy.EconomyResponse;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Rotation;
 import org.bukkit.block.Block;
@@ -25,6 +28,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.material.Lever;
 
 public class SlotPlayerListner implements Listener{
@@ -32,7 +36,7 @@ public class SlotPlayerListner implements Listener{
 	public SlotPlayerListner(CasinoMain plugin) {
 		this.plugin = plugin;
 	}
-	public void SpawnItemFrame(Player p,Block b, BlockFace face, ItemStack item, Rotation rotation){
+	public void spawnItemFrame(Player p,Block b, BlockFace face, ItemStack item, Rotation rotation){
 	ItemFrame i = (ItemFrame) p.getWorld().spawn(b.getLocation(), ItemFrame.class);
 	if(face != BlockFace.EAST){
 		i.teleport(b.getRelative(face).getLocation());
@@ -43,7 +47,111 @@ public class SlotPlayerListner implements Listener{
 			}
 		}
 	}
-
+	public ItemFrame getItemFrame(Location l){
+		for(Entity e:l.getChunk().getEntities()){
+			if(e.getLocation().getBlock().equals(l.getBlock())){
+				if(e.getType().equals(EntityType.ITEM_FRAME)){
+					return (ItemFrame) e;
+				}
+			}
+		}
+		return null;
+	}
+	public BlockFace getCounterClockWiseBlocK(BlockFace bf){
+		HashMap<BlockFace,BlockFace> CounterClockWise = new HashMap<BlockFace,BlockFace>();
+		CounterClockWise.put(BlockFace.NORTH, BlockFace.WEST);
+		CounterClockWise.put(BlockFace.WEST, BlockFace.SOUTH);
+		CounterClockWise.put(BlockFace.SOUTH, BlockFace.EAST);
+		CounterClockWise.put(BlockFace.EAST, BlockFace.NORTH);
+		if(!bf.equals(BlockFace.DOWN)&&!bf.equals(BlockFace.UP)){
+			return CounterClockWise.get(bf);
+		}else{
+			return null;
+		}
+	}
+	public Material[] getMaterialsFromBook(ItemStack book){
+		BookMeta bm = (BookMeta) book.getItemMeta(); 
+		int StringCounter=0;
+		for(int x=1;bm.getPageCount()>x;x++){
+			String[] lines = bm.getPage(x).split("\n");
+			for(String l:lines){
+				if(l.startsWith("Type:")){
+					StringCounter++;
+				}
+			}
+		}
+		Material[] q= new Material[StringCounter];
+		for(int x=1;bm.getPageCount()>x;x++){
+			String[] lines = bm.getPage(x).split("\n");
+			for(String l:lines){
+				
+				if(l.startsWith("Type: ")){
+					for (int i = 0; i < q.length; i++) {
+						if(q[i]==null){
+							q[i]=Material.getMaterial(l.replace("Type: ", ""));
+							break;
+						}
+							
+						}
+					}
+				}
+			}
+		
+		return q;
+	}
+    public Double[] getBetAmountsFromBook(ItemStack book){
+    	BookMeta bm = (BookMeta) book.getItemMeta(); 
+		int StringCounter=0;
+		for(int x=1;bm.getPageCount()>x;x++){
+			String[] lines = bm.getPage(x).split("\n");
+			for(String l:lines){
+				if(l.startsWith("Type:")){
+					StringCounter++;
+				}
+			}
+		}
+		Double[] q= new Double[StringCounter];
+		for(int x=1;bm.getPageCount()>x;x++){
+			String[] lines = bm.getPage(x).split("\n");
+			for(String l:lines){
+				
+				if(l.startsWith("Bet: ")){
+					for (int i = 0; i < q.length; i++) {
+						if(q[i]==null){
+							q[i]= Double.valueOf(l.replace("Bet: ", ""));
+							break;
+						}
+							
+						}
+					}
+				}
+			}
+		
+		return q;
+    }
+	public static ItemStack SlotMachineCPU = new ItemStack(Material.BOOK_AND_QUILL);
+	BookMeta SlotMachineMeta  = (BookMeta) SlotMachineCPU.getItemMeta();
+	List<String> SlotMachineLore = new ArrayList<String>();{
+		SlotMachineLore.add("Place this in an item fram to create a slot machine");
+		SlotMachineMeta.setLore(SlotMachineLore);
+		SlotMachineMeta.setDisplayName("SlotMachine CPU");
+	    SlotMachineMeta.addPage("");
+	    SlotMachineMeta.addPage("");
+	    SlotMachineMeta.addPage("");
+	    SlotMachineMeta.addPage("");
+	    SlotMachineMeta.addPage("");
+	    SlotMachineMeta.addPage("");
+	    SlotMachineMeta.addPage("");
+		SlotMachineMeta.setPage(1, "Bets:\nBet: 5\nBet: 10\nBet: 20\nBet: 50\nBet: 100");
+		SlotMachineMeta.setPage(2, "Reel 1:\nRateModifyer: 0.1\nType: DIAMOND\nPayout: 100");
+		SlotMachineMeta.setPage(3, "Reel 2:\nRateModifyer: 0.35\nType: EMERALD\nPayout: 20");
+		SlotMachineMeta.setPage(4, "Reel 3:\nRateModifyer: 0.8\nType: GOLD_INGOT\nPayout: 10");
+		SlotMachineMeta.setPage(5, "Reel 4:\nRateModifyer: 1\nType: IRON_INGOT\nPayout: 5");
+		SlotMachineMeta.setPage(6, "Reel 5:\nRateModifyer: 1.5\nType: REDSTONE\nPayout: 3");
+		SlotMachineMeta.setPage(7, "Reel 6:\nRateModifyer: 3\nType: COAL\nPayout: 2");
+		SlotMachineCPU.setItemMeta(SlotMachineMeta);
+		
+	}
 	@EventHandler
 	public void OnSignPlace(SignChangeEvent e){
 			if(e.getLine(1).equalsIgnoreCase("SlotMachine")||e.getLine(1).equalsIgnoreCase(ChatColor.DARK_GREEN+"SlotMachine")){
@@ -65,17 +173,11 @@ public class SlotPlayerListner implements Listener{
         if(e.hasBlock()){
          if(e.getClickedBlock().getType().equals(Material.LEVER)){
         	 if(e.getAction().equals(Action.RIGHT_CLICK_BLOCK)){
-         		final HashMap<BlockFace,BlockFace> CounterClockWise = new HashMap<BlockFace,BlockFace>();
-        		CounterClockWise.put(BlockFace.NORTH, BlockFace.WEST);
-        		CounterClockWise.put(BlockFace.WEST, BlockFace.SOUTH);
-        		CounterClockWise.put(BlockFace.SOUTH, BlockFace.EAST);
-        		CounterClockWise.put(BlockFace.EAST, BlockFace.NORTH);
-        		//Hash map so I can track the blocks next to the lever/sign
         	final BlockState state = e.getClickedBlock().getState();
             final Lever l = (Lever) state.getData();
             if(!l.getAttachedFace().equals(BlockFace.UP)&&!l.getAttachedFace().equals(BlockFace.DOWN)){
-            if(e.getClickedBlock().getRelative(l.getAttachedFace()).getRelative(CounterClockWise.get(l.getAttachedFace()), 4).getRelative(l.getAttachedFace().getOppositeFace()).getState() instanceof Sign){
-            	final Sign s = (Sign) e.getClickedBlock().getRelative(l.getAttachedFace()).getRelative(CounterClockWise.get(l.getAttachedFace()), 4).getRelative(l.getAttachedFace().getOppositeFace()).getState();
+            if(e.getClickedBlock().getRelative(l.getAttachedFace()).getRelative(getCounterClockWiseBlocK(l.getAttachedFace()), 4).getRelative(l.getAttachedFace().getOppositeFace()).getState() instanceof Sign){
+            	final Sign s = (Sign) e.getClickedBlock().getRelative(l.getAttachedFace()).getRelative(getCounterClockWiseBlocK(l.getAttachedFace()), 4).getRelative(l.getAttachedFace().getOppositeFace()).getState();
             e.setCancelled(true);
             if(!l.isPowered()){
             	if(s.getLine(1).equals(ChatColor.DARK_GREEN+"SlotMachine")&&s.getLine(2).contains("Bet:")){
@@ -110,13 +212,11 @@ public class SlotPlayerListner implements Listener{
         		 final int Fx=x;
         		 //Finals because I have no idea how to code
         		 if(Fy==1||Fy==2&&x<=30||Fy==3&&x<=15){
-        		 final Block b =e.getClickedBlock().getRelative(l.getAttachedFace()).getRelative(CounterClockWise.get(l.getAttachedFace()), Fy).getRelative(l.getAttachedFace().getOppositeFace());
-				 for(final Entity ent :b.getChunk().getEntities()){
-					  if(ent.getLocation().getBlock().getLocation().equals(b.getLocation())){
-						  if(ent.getType().equals(EntityType.ITEM_FRAME)){
+        		 final Block b =e.getClickedBlock().getRelative(l.getAttachedFace()).getRelative(getCounterClockWiseBlocK(l.getAttachedFace()), Fy).getRelative(l.getAttachedFace().getOppositeFace());
+        		 		if(!getItemFrame(b.getLocation()).equals(null)){
 							  plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
 								  public void run() {
-								  ItemFrame i=(ItemFrame) ent;
+								  ItemFrame i= getItemFrame(b.getLocation());
 								  if(ItemSwither.containsKey(i.getItem())){
 									  i.setItem(ItemSwither.get(i.getItem()));
 								  }else{
@@ -126,7 +226,7 @@ public class SlotPlayerListner implements Listener{
 							//Randomizer(for aesthetic appeal), Just changes the items for the reel effect
 							  plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
 								  public void run() {
-									  ItemFrame i =(ItemFrame) ent;
+									  ItemFrame i = getItemFrame(b.getLocation());
 									  double WinChance[]=plugin.getRate();
 									  double PercentCounter=0;
 									  int WinNumber = 0;
@@ -153,7 +253,6 @@ public class SlotPlayerListner implements Listener{
 									  }
 									//Calculate how much to Reward the player and do it
 									   if(Fy==1&&Fx==45){
-										   //(if it's the last bit of code running
 										   if(WinNumber!=0){
 											   //if they didn't lose
 										   int WinAmount = 0;
@@ -171,8 +270,6 @@ public class SlotPlayerListner implements Listener{
 								  }}, (-30*Fy)+122);
 							  //Fires the events at 92 47 32
 						  }
-					  	  }
-				 		  }
         		 		  }
         		 	      }
         				  }
@@ -194,16 +291,11 @@ public class SlotPlayerListner implements Listener{
         	if(s.getLine(1).equals(ChatColor.DARK_GREEN+"SlotMachine")&&s.getLine(2).contains("Bet:")){
         org.bukkit.material.Sign S= (org.bukkit.material.Sign) e.getClickedBlock().getState().getData();
         if(S.isWallSign()){
-     		final HashMap<BlockFace,BlockFace> CounterClockWise = new HashMap<BlockFace,BlockFace>();
-    		CounterClockWise.put(BlockFace.NORTH, BlockFace.WEST);
-    		CounterClockWise.put(BlockFace.WEST, BlockFace.SOUTH);
-    		CounterClockWise.put(BlockFace.SOUTH, BlockFace.EAST);
-    		CounterClockWise.put(BlockFace.EAST, BlockFace.NORTH);        	
-        	//Hashmap used for checking where the lever is
-    		if(e.getClickedBlock().getRelative(CounterClockWise.get(S.getAttachedFace().getOppositeFace()), 4).getType().equals(Material.LEVER)){
-        		Lever l=(Lever) e.getClickedBlock().getRelative(CounterClockWise.get(S.getAttachedFace().getOppositeFace()), 4).getState().getData();
+    		if(e.getClickedBlock().getRelative(getCounterClockWiseBlocK(S.getAttachedFace().getOppositeFace()), 4).getType().equals(Material.LEVER)){
+        		Lever l=(Lever) e.getClickedBlock().getRelative(getCounterClockWiseBlocK(S.getAttachedFace().getOppositeFace()), 4).getState().getData();
         		if(!l.isPowered()){
         			Integer[] a = new Integer[plugin.getConfig().getConfigurationSection("BetAmounts").getInt("NumberofBets")];
+
         			for(int x=0; x<a.length; x++){
         				a[x]=plugin.getConfig().getConfigurationSection("BetAmounts").getInt("Bet"+(x+1));
         			}
