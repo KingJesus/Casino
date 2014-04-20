@@ -2,11 +2,8 @@ package me.KingJesusThe5th.Slots.Listeners;
 
 
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Random;
-
 import me.KingJesusThe5th.Main.CasinoMain;
 import net.milkbowl.vault.economy.EconomyResponse;
 
@@ -69,26 +66,29 @@ public class SlotPlayerListner implements Listener{
 			return null;
 		}
 	}
+	public ItemStack getBookFromSlotMachineItemFrame(BlockFace attachedleverbf, Location leverlocation){
+		return getItemFrame(leverlocation.getBlock().getRelative(attachedleverbf, 2).getRelative(getCounterClockWiseBlocK(attachedleverbf), 2).getLocation()).getItem();
+	}
 	public Material[] getMaterialsFromBook(ItemStack book){
 		BookMeta bm = (BookMeta) book.getItemMeta(); 
 		int StringCounter=0;
-		for(int x=1;bm.getPageCount()>x;x++){
+		for(int x=1;bm.getPageCount()>=x;x++){
 			String[] lines = bm.getPage(x).split("\n");
 			for(String l:lines){
-				if(l.startsWith("Type:")){
+				if(l.startsWith("Material-")){
 					StringCounter++;
 				}
 			}
 		}
 		Material[] q= new Material[StringCounter];
-		for(int x=1;bm.getPageCount()>x;x++){
+		for(int x=1;bm.getPageCount()>=x;x++){
 			String[] lines = bm.getPage(x).split("\n");
 			for(String l:lines){
 				
-				if(l.startsWith("Type: ")){
-					for (int i = 0; i < q.length; i++) {
+				if(l.startsWith("Material-")){
+					for (int i = 0; i <= q.length; i++) {
 						if(q[i]==null){
-							q[i]=Material.getMaterial(l.replace("Type: ", ""));
+							q[i]=Material.getMaterial(l.replace("Material-", ""));
 							break;
 						}
 							
@@ -99,26 +99,26 @@ public class SlotPlayerListner implements Listener{
 		
 		return q;
 	}
-    public Double[] getBetAmountsFromBook(ItemStack book){
+    public Double[] getDoubleFromBook(ItemStack book, String stringtogetfrom){
     	BookMeta bm = (BookMeta) book.getItemMeta(); 
 		int StringCounter=0;
-		for(int x=1;bm.getPageCount()>x;x++){
+		for(int x=1;bm.getPageCount()>=x;x++){
 			String[] lines = bm.getPage(x).split("\n");
 			for(String l:lines){
-				if(l.startsWith("Bet: ")){
+				if(l.startsWith(stringtogetfrom)){
 					StringCounter++;
 				}
 			}
 		}
 		Double[] q= new Double[StringCounter];
-		for(int x=1;bm.getPageCount()>x;x++){
+		for(int x=1;bm.getPageCount()>=x;x++){
 			String[] lines = bm.getPage(x).split("\n");
 			for(String l:lines){
 				
-				if(l.startsWith("Bet: ")){
+				if(l.startsWith(stringtogetfrom)){
 					for (int i = 0; i < q.length; i++) {
 						if(q[i]==null){
-							q[i]= Double.valueOf(l.replace("Bet: ", ""));
+							q[i]= Double.valueOf(l.replace(stringtogetfrom, ""));
 							break;
 						}
 							
@@ -126,53 +126,31 @@ public class SlotPlayerListner implements Listener{
 					}
 				}
 			}
-		
 		return q;
     }
-	public static ItemStack SlotMachineCPU = new ItemStack(Material.BOOK_AND_QUILL);
-	BookMeta SlotMachineMeta  = (BookMeta) SlotMachineCPU.getItemMeta();
-	List<String> SlotMachineLore = new ArrayList<String>();{
-		SlotMachineLore.add("Place this in an item fram to create a slot machine");
-		SlotMachineMeta.setLore(SlotMachineLore);
-		SlotMachineMeta.setDisplayName("SlotMachine CPU");
-	    SlotMachineMeta.addPage("");
-	    SlotMachineMeta.addPage("");
-	    SlotMachineMeta.addPage("");
-	    SlotMachineMeta.addPage("");
-	    SlotMachineMeta.addPage("");
-	    SlotMachineMeta.addPage("");
-	    SlotMachineMeta.addPage("");
-		SlotMachineMeta.setPage(1, "Bets:\nBet: 5\nBet: 10\nBet: 20\nBet: 50\nBet: 100");
-		SlotMachineMeta.setPage(2, "Reel 1:\nRateModifyer: 0.1\nType: DIAMOND\nPayout: 100");
-		SlotMachineMeta.setPage(3, "Reel 2:\nRateModifyer: 0.35\nType: EMERALD\nPayout: 20");
-		SlotMachineMeta.setPage(4, "Reel 3:\nRateModifyer: 0.8\nType: GOLD_INGOT\nPayout: 10");
-		SlotMachineMeta.setPage(5, "Reel 4:\nRateModifyer: 1\nType: IRON_INGOT\nPayout: 5");
-		SlotMachineMeta.setPage(6, "Reel 5:\nRateModifyer: 1.5\nType: REDSTONE\nPayout: 3");
-		SlotMachineMeta.setPage(7, "Reel 6:\nRateModifyer: 3\nType: COAL\nPayout: 2");
-		SlotMachineCPU.setItemMeta(SlotMachineMeta);
-		
-	}
+
 	@EventHandler
 	public void OnSignPlace(SignChangeEvent e){
 			if(e.getLine(1).equalsIgnoreCase("SlotMachine")||e.getLine(1).equalsIgnoreCase(ChatColor.DARK_GREEN+"SlotMachine")){
 				if(e.getPlayer().hasPermission("Casino.SlotMachine.Place")){
 					//Checks if a player placed down a slotmachine sign and has permission
 				e.setLine(1, ChatColor.DARK_GREEN+"SlotMachine");
-					if(!e.getLine(2).contains("\\d+")){
-						//Checks if line 2 contains a number, if not sets it
-						e.setLine(2, "Bet: "+plugin.getConfig().getConfigurationSection("BetAmounts").getInt("Bet1"));
-					}
+				org.bukkit.material.Sign s = (org.bukkit.material.Sign) e.getBlock().getState().getData();
+				Location lever = e.getBlock().getRelative(getCounterClockWiseBlocK(s.getAttachedFace().getOppositeFace()),4).getLocation();
+						e.setLine(2, "Bet: "+getDoubleFromBook(getBookFromSlotMachineItemFrame(s.getAttachedFace(), lever), "Bet-")[0]);
 				}else{
 					e.setLine(1, "SlotMachine");
 					//If the player doesn't have permission set it to black
 				}
 			}
 	}
+	
 	@EventHandler
 	public void OnInteract(final PlayerInteractEvent e){
         if(e.hasBlock()){
          if(e.getClickedBlock().getType().equals(Material.LEVER)){
         	 if(e.getAction().equals(Action.RIGHT_CLICK_BLOCK)){
+        		
         	final BlockState state = e.getClickedBlock().getState();
             final Lever l = (Lever) state.getData();
             if(!l.getAttachedFace().equals(BlockFace.UP)&&!l.getAttachedFace().equals(BlockFace.DOWN)){
@@ -197,13 +175,13 @@ public class SlotPlayerListner implements Listener{
 			  final Random r = new Random();
 				 final double Ran =r.nextDouble()+r.nextInt(100);
 			//Random number(Between 0-100, Used to check if/what the player wins
-			int NumberofReels = plugin.getConfig().getInt("NumberofSlots");
+			final Material[] Mat = getMaterialsFromBook(getBookFromSlotMachineItemFrame(l.getAttachedFace(), e.getClickedBlock().getLocation()));
     		final HashMap<Integer,ItemStack> Temp = new HashMap<Integer,ItemStack>();
     		//Just used it making sure that the last item isn't that same as the first 2
     		final HashMap<ItemStack,ItemStack> ItemSwither = new HashMap<ItemStack,ItemStack>();
-    		ItemSwither.put(new ItemStack(Material.getMaterial(plugin.getConfig().getConfigurationSection("Item1").getString("ItemType"))), new ItemStack(Material.getMaterial(plugin.getConfig().getConfigurationSection("Item"+NumberofReels).getString("ItemType"))));
-    		for(int y = 2; y <= NumberofReels; y++) {
-    			ItemSwither.put(new ItemStack(Material.getMaterial(plugin.getConfig().getConfigurationSection("Item"+y).getString("ItemType"))), new ItemStack(Material.getMaterial(plugin.getConfig().getConfigurationSection("Item"+(y-1)).getString("ItemType"))));
+    		ItemSwither.put(new ItemStack(Mat[0]), new ItemStack(Mat[Mat.length-1]));
+    		for(int y = 1; y < Mat.length; y++) {
+    			ItemSwither.put(new ItemStack(Mat[y]), new ItemStack(Mat[y-1]));
     		}
     		//Used to get the "reel" effect, Just switch the items in the frame with the next one
         	for(int x =0;x<=45;x++){
@@ -220,29 +198,32 @@ public class SlotPlayerListner implements Listener{
 								  if(ItemSwither.containsKey(i.getItem())){
 									  i.setItem(ItemSwither.get(i.getItem()));
 								  }else{
-									  i.setItem(new ItemStack(Material.getMaterial(plugin.getConfig().getConfigurationSection("Item1").getString("ItemType"))));
+									  i.setItem(new ItemStack(Mat[0]));
 								  }
 								  }}, (x*2));
 							//Randomizer(for aesthetic appeal), Just changes the items for the reel effect
+							  
 							  plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
 								  public void run() {
 									  ItemFrame i = getItemFrame(b.getLocation());
-									  double WinChance[]=plugin.getRate();
+									  double WinChance[]=plugin.getRate(Mat.length);
 									  double PercentCounter=0;
-									  int WinNumber = 0;
-									  for (int c = 1; c < WinChance.length+1; c++) {
-										  PercentCounter=PercentCounter+WinChance[c-1];  
+									  boolean Win = false;
+									  int ArrayCounter=0;
+									  for (int c = 0; c <= WinChance.length-1; c++) {
+										  ArrayCounter++;
+										   PercentCounter=PercentCounter+WinChance[c];
 										  if(PercentCounter>=Ran){
 											  //Checks if the player won, Sets the winning item
-										    	i.setItem(new ItemStack(Material.getMaterial(plugin.getConfig().getConfigurationSection("Item"+c).getString("ItemType"))));
-										    	WinNumber=c;
+											  	i.setItem(new ItemStack(Mat[c]));
+										    	Win=true;
 										    	break;
 										    }
-										  if(c==WinChance.length){
+										  if(c+1==WinChance.length){
 											//makes sure that the losing items arn't the same
-												if(Fy==3||Fy==2){
-													i.setItem(ItemSwither.get(ItemSwither.get(i.getItem())));
-													//Just some randomness so it's less predictable
+										
+											  if(Fy==3||Fy==2){
+													i.setItem(ItemSwither.get(i.getItem()));
 													Temp.put(Fy, i.getItem());
 												}else{
 													if(Temp.get(3).getType()==Temp.get(2).getType()){
@@ -253,16 +234,16 @@ public class SlotPlayerListner implements Listener{
 									  }
 									//Calculate how much to Reward the player and do it
 									   if(Fy==1&&Fx==45){
-										   if(WinNumber!=0){
+										   if(Win){
 											   //if they didn't lose
-										   int WinAmount = 0;
-												WinAmount = Integer.parseInt(s.getLine(2).replaceFirst(".*?(\\d+).*", "$1"))*(plugin.getConfig().getConfigurationSection("Item"+WinNumber).getInt("ItemPayout"));
+										   double WinAmount = 0;
+										   WinAmount = Double.parseDouble(s.getLine(2).replaceFirst(".*?(\\d+).*", "$1"))*(getDoubleFromBook(getBookFromSlotMachineItemFrame(l.getAttachedFace(), e.getClickedBlock().getLocation()), "Payout-")[ArrayCounter-1]);
 											   EconomyResponse r = CasinoMain.econ.depositPlayer(e.getPlayer().getName(), WinAmount);
 											   //Adds money to there account based on the sign
 											   e.getPlayer().sendMessage(String.format(""+ChatColor.DARK_GREEN+"Congratulations!"+ChatColor.WHITE+" You won "+ChatColor.YELLOW+"%s!", CasinoMain.econ.format(r.amount)));								
-							 			if(plugin.getConfig().getConfigurationSection("Item"+WinNumber).getBoolean("Jackpot")){
+							 			//if(plugin.getConfig().getConfigurationSection("Item"+WinNumber).getBoolean("Jackpot")){
 							 					plugin.getServer().broadcastMessage(e.getPlayer().getDisplayName()+ChatColor.WHITE+" Just won "+ChatColor.DARK_GREEN+"$"+r.amount+ChatColor.WHITE+" at The Casino!");
-												}
+											//	}
 										   }else{
 											   e.getPlayer().sendMessage(""+ChatColor.BLUE+"Better Luck next time");
 										   }
@@ -292,17 +273,12 @@ public class SlotPlayerListner implements Listener{
         org.bukkit.material.Sign S= (org.bukkit.material.Sign) e.getClickedBlock().getState().getData();
         if(S.isWallSign()){
     		if(e.getClickedBlock().getRelative(getCounterClockWiseBlocK(S.getAttachedFace().getOppositeFace()), 4).getType().equals(Material.LEVER)){
-        		Lever l=(Lever) e.getClickedBlock().getRelative(getCounterClockWiseBlocK(S.getAttachedFace().getOppositeFace()), 4).getState().getData();
+    		    Block leverblock =e.getClickedBlock().getRelative(getCounterClockWiseBlocK(S.getAttachedFace().getOppositeFace()), 4);
+        		Lever l=(Lever) leverblock.getState().getData();
         		if(!l.isPowered()){
-        			Integer[] a = new Integer[plugin.getConfig().getConfigurationSection("BetAmounts").getInt("NumberofBets")];
-
-        			for(int x=0; x<a.length; x++){
-        				a[x]=plugin.getConfig().getConfigurationSection("BetAmounts").getInt("Bet"+(x+1));
-        			}
-        			//Puts all the bet amounts in an array
+        			Double[] a = getDoubleFromBook(getBookFromSlotMachineItemFrame(l.getAttachedFace(), leverblock.getLocation()), "Bet-");
         			for(int x = 0; x < a.length; x++){
-        				if(a[x].equals(Integer.parseInt(s.getLine(2).replaceFirst(".*?(\\d+).*", "$1")))){
-        					{
+        				if(a[x].equals(Double.parseDouble(s.getLine(2).replaceFirst(".*?(\\d+).*", "$1")))){	
         						if(x+1==a.length){
         							s.setLine(2, "Bet: "+a[0]);
         							s.update();
@@ -313,7 +289,6 @@ public class SlotPlayerListner implements Listener{
         							break;
         						}
         						//gets the next amount in the array
-        					}
         				}
         			}
         		}

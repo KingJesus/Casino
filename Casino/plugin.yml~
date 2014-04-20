@@ -1,8 +1,8 @@
 name: Casino
 main: me.KingJesusThe5th.Main.CasinoMain
-version: 0.2.0
+version: 0.1.1
 description: >
              Casino Plugin
 commands:
   Casino:
-    description: Version 0.2.0
+    description: Version 0.1.1
