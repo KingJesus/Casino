@@ -66,7 +66,7 @@ List<String> SlotMachineLore = new ArrayList<String>();{
 						p.sendMessage("usage:/Casino ItemId Payout Rateamount\nex:/Casino 266 5 1");
 					}
 				}else{
-					p.sendMessage("no book");
+					p.sendMessage("You must be holding a book to do that");
 				}
 				}else if(args[0].equalsIgnoreCase("MakeCpu")){
 					if(args.length>=3&&args.length<=12&&p.getInventory().firstEmpty()!=-1){

@@ -129,7 +129,21 @@ public class SlotPlayerListner implements Listener{
 			}
 		return q;
     }
-
+    public void setSignToNextBet(Sign s, Double[] array){
+		 for(int x = 0; x < array.length; x++){
+			 if(array[x].equals(Double.parseDouble(s.getLine(2).replaceFirst(".*?(\\d+).*", "$1")))){	
+				 if(x+1==array.length){
+					 s.setLine(2, "Bet: "+array[0]);
+					 s.update();
+					 break;
+				 }else{
+					 s.setLine(2, "Bet: "+array[x+1]);
+					 s.update();
+					 break;
+				 }
+			 }
+		 }
+    }
 	@EventHandler
 	public void OnSignPlace(SignChangeEvent e){
 			if(e.getLine(1).equalsIgnoreCase("SlotMachine")||e.getLine(1).equalsIgnoreCase(ChatColor.DARK_GREEN+"SlotMachine")){
@@ -274,35 +288,22 @@ public class SlotPlayerListner implements Listener{
          //Check if they clicked a sign (Changes the bets)
          if(e.getClickedBlock().getState() instanceof Sign){
         	 Sign s=(Sign) e.getClickedBlock().getState();
-        	 if(s.getLine(1).equals(ChatColor.DARK_GREEN+"SlotMachine")&&s.getLine(2).contains("Bet:")){
-        		 org.bukkit.material.Sign S= (org.bukkit.material.Sign) e.getClickedBlock().getState().getData();
-        		 if(S.isWallSign()){
-        			 if(e.getClickedBlock().getRelative(getCounterClockWiseBlocK(S.getAttachedFace().getOppositeFace()), 4).getType().equals(Material.LEVER)){
-        				 Block leverblock =e.getClickedBlock().getRelative(getCounterClockWiseBlocK(S.getAttachedFace().getOppositeFace()), 4);
-        				 Lever l=(Lever) leverblock.getState().getData();
-        				 if(!l.isPowered()){
-        					 Double[] a = getDoubleFromBook(getBookFromSlotMachineItemFrame(l.getAttachedFace(), leverblock.getLocation()), "Bet-");
-        					 for(int x = 0; x < a.length; x++){
-        						 if(a[x].equals(Double.parseDouble(s.getLine(2).replaceFirst(".*?(\\d+).*", "$1")))){	
-        							 if(x+1==a.length){
-        								 s.setLine(2, "Bet: "+a[0]);
-        								 s.update();
-        								 break;
-        							 }else{
-        								 s.setLine(2, "Bet: "+a[x+1]);
-        								 s.update();
-        								 break;
-        							 }
-        							 //gets the next amount in the array
-        						 }
+        	 org.bukkit.material.Sign S= (org.bukkit.material.Sign) e.getClickedBlock().getState().getData();
+        	 	 if(s.getLine(1).equals(ChatColor.DARK_GREEN+"SlotMachine")&&s.getLine(2).contains("Bet:")){
+        	 		 if(e.getClickedBlock().getRelative(getCounterClockWiseBlocK(S.getAttachedFace().getOppositeFace()), 4).getType().equals(Material.LEVER)){
+        	 			 Block leverblock =e.getClickedBlock().getRelative(getCounterClockWiseBlocK(S.getAttachedFace().getOppositeFace()), 4);
+        	 			 Lever l=(Lever) leverblock.getState().getData();
+        	 			 if(!l.isPowered()){
+        					 if(getBookFromSlotMachineItemFrame(l.getAttachedFace(), leverblock.getLocation())!=null){
+        						 Double[] a = getDoubleFromBook(getBookFromSlotMachineItemFrame(l.getAttachedFace(), leverblock.getLocation()), "Bet-");
+        						 setSignToNextBet(s, a);
         					 }
         				 }
         			 }
-        		 }
         	 }
          }
         }
         
-        //End of event
+        //End of Interact event
 	}
 }
