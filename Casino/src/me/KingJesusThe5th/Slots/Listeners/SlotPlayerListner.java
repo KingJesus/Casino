@@ -229,7 +229,7 @@ public class SlotPlayerListner implements Listener{
             							//Randomizer(for aesthetic appeal), Just changes the items for the reel effect
             							plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
             							public void run() {
-            								double WinChance[]=plugin.getRate(Mat.length);
+            								double WinChance[]=plugin.getRate(getDoubleFromBook(CPU, "Payout-"), getDoubleFromBook(CPU, "WinChance-")[0]);
             								double PercentCounter=0;
             								boolean Win = false;
             								int ArrayCounter=0;

@@ -53,18 +53,24 @@ public class CasinoMain extends JavaPlugin implements Listener{
 	    //--Vault--
 	    //SlotMachine
 	    //Gets the % chance for each item to win and puts it in the array
-		public double[] getRate(int NumberofReels){
-			double[] ItemHitChance=new double[NumberofReels];
-			double WinPercent = getConfig().getDouble("WinPercent");
-			double Modifyer=0;
-			for(int x=1;x<=NumberofReels;x++){
-				Modifyer=getConfig().getConfigurationSection("Item"+x).getDouble("Rate")+Modifyer;
+	    public double[] getModifyer(Double[] Payouts){
+	    	double [] Modifyer =new double[Payouts.length];
+	    for(int x=0;x<Modifyer.length;x++){
+	    	Modifyer[x]=(1/(Math.sqrt(Payouts[x])));
+	    }
+	    	return Modifyer;
+	    }
+		public double[] getRate(Double[] Payouts, double WinPercent){
+			double[] ItemHitChance=new double[Payouts.length];
+			double counter=0;
+			for(double M: getModifyer(Payouts)){
+				counter=M+counter;
 			}
-			Modifyer=NumberofReels/Modifyer;
-			for(int x=1;x<=NumberofReels;x++){
-				double ItemPayout =getConfig().getConfigurationSection("Item"+x).getDouble("ItemPayout");
-				double ItemRate=getConfig().getConfigurationSection("Item"+x).getDouble("Rate");
-				ItemHitChance[x-1]=(1/(ItemPayout*NumberofReels))*Modifyer*ItemRate*WinPercent;
+			counter=Payouts.length/counter;
+			for(int x=0;x<Payouts.length;x++){
+				double ItemPayout=Payouts[x];
+				double ItemRate=getModifyer(Payouts)[x];
+				ItemHitChance[x]=(1/(ItemPayout*Payouts.length))*counter*ItemRate*WinPercent;
 			}
 
 			return ItemHitChance;
