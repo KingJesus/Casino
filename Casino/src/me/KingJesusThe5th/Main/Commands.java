@@ -60,10 +60,10 @@ List<String> SlotMachineLore = new ArrayList<String>();{
 				if(args.length>=1){
 				if(args[0].equalsIgnoreCase("SetCpu")){
 				if(p.getItemInHand().getType().equals(Material.BOOK_AND_QUILL)){
-					if(args.length>=4&&isInt(args[1])&&isDouble(args[2])&&isDouble(args[3])){
-					WriteinBook(p.getItemInHand(), "Material-"+Material.getMaterial(Integer.parseInt(args[1]))+"\nPayout-"+args[2]+"\nRate-"+args[3]);
+					if(args.length>=3&&isInt(args[1])&&isDouble(args[2])){
+					WriteinBook(p.getItemInHand(), "Material-"+Material.getMaterial(Integer.parseInt(args[1]))+"\nPayout-"+args[2]);
 					}else{
-						p.sendMessage("usage:/Casino ItemId Payout Rateamount\nex:/Casino 266 5 1");
+						p.sendMessage("usage:/Casino ItemId Payout\nex:/Casino 266 5");
 					}
 				}else{
 					p.sendMessage("You must be holding a book to do that");
