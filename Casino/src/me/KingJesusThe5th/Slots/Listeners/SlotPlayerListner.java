@@ -142,6 +142,11 @@ public class SlotPlayerListner implements Listener{
 					 break;
 				 }
 			 }
+			 if(x==array.length-1){
+				 s.setLine(2, "Bet: "+array[0]);
+				 s.update();
+				 //If nothing matches set it to the first number
+			 }
 		 }
     }
 	@EventHandler
@@ -159,7 +164,7 @@ public class SlotPlayerListner implements Listener{
 				}
 			}
 	}
-	
+	public int FrameCounter;
 	@EventHandler
 	public void OnInteract(final PlayerInteractEvent e){
         if(e.hasBlock()){
@@ -173,7 +178,9 @@ public class SlotPlayerListner implements Listener{
             		//Checks if there's a sign 4 blocks next to it
             		final Sign s = (Sign) e.getClickedBlock().getRelative(l.getAttachedFace()).getRelative(getCounterClockWiseBlocK(l.getAttachedFace()), 4).getRelative(l.getAttachedFace().getOppositeFace()).getState();
             		final BookMeta CPU = getBookFromSlotMachineItemFrame(l.getAttachedFace(), e.getClickedBlock().getLocation());
-            		e.setCancelled(true); 	
+            		final Material[] Mat = getMaterialsFromBook(CPU);
+            		if(Mat.length>=2){
+            			e.setCancelled(true); 	
             			if(!l.isPowered()){
             			if(s.getLine(1).equals(ChatColor.DARK_GREEN+"SlotMachine")&&s.getLine(2).contains("Bet:")){
             			if(CasinoMain.econ.getBalance(e.getPlayer().getName())>=Integer.parseInt(s.getLine(2).replaceFirst(".*?(\\d+).*", "$1"))){
@@ -192,7 +199,6 @@ public class SlotPlayerListner implements Listener{
             				final Random r = new Random();
             				final double Ran =r.nextDouble()+r.nextInt(100);
             				//Random number(Between 0-100, Used to check if/what the player wins
-            				final Material[] Mat = getMaterialsFromBook(CPU);
             				final HashMap<Integer,ItemStack> Temp = new HashMap<Integer,ItemStack>();
             				//used in making sure that the last item isn't that same as the first 2
             				final HashMap<ItemStack,ItemStack> ItemSwither = new HashMap<ItemStack,ItemStack>();
@@ -209,13 +215,13 @@ public class SlotPlayerListner implements Listener{
             							}
             							Frames[c]=getItemFrame(b.getLocation());
             						}
-            						//Puts the 3 item frames in a hash map
-            						for(int y =1;y<=3;y++){
-            							final int Fy=y;
-            							final ItemFrame i=  Frames[Fy-1];
-            							for(int x =0;x<=45;x++){
-            								//Finals because I have no idea how to code
-            								if(Fy==1||Fy==2&&x<=30||Fy==3&&x<=15){
+            						//Puts the 3 item frames in an array
+            						FrameCounter=0;
+            						for(final ItemFrame i:Frames){
+            							FrameCounter++;
+            							final int Fc=FrameCounter;
+            							for(int TickCounter =0;TickCounter<=45;TickCounter++){
+            								if(Fc==1||Fc==2&&TickCounter<=30||Fc==3&&TickCounter<=15){
             									plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
             									public void run() {
             										if(ItemSwither.containsKey(i.getItem())){
@@ -223,7 +229,7 @@ public class SlotPlayerListner implements Listener{
             										}else{
             											i.setItem(new ItemStack(Mat[0]));
             										}
-            									}}, (x*2));
+            									}}, (TickCounter*2));
             								}	
             							}
             							//Randomizer(for aesthetic appeal), Just changes the items for the reel effect
@@ -233,29 +239,32 @@ public class SlotPlayerListner implements Listener{
             								double PercentCounter=0;
             								boolean Win = false;
             								int ArrayCounter=0;
-            								for (int c = 0; c <= WinChance.length-1; c++) {
+            								for (int x = 0; x <= WinChance.length-1; x++) {
             									ArrayCounter++;
-            									PercentCounter=PercentCounter+WinChance[c];
+            									PercentCounter=PercentCounter+WinChance[x];
             									if(PercentCounter>=Ran){
             										//Checks if the player won, Sets the winning item
-            										i.setItem(new ItemStack(Mat[c]));
+            										i.setItem(new ItemStack(Mat[x]));
 											  		Win=true;
 											  		break;
             									}
-            									if(c+1==WinChance.length){
-            										//makes sure that the losing items arn't the same
-            										if(Fy==3||Fy==2){
-            											i.setItem(ItemSwither.get(i.getItem()));
-            											Temp.put(Fy, i.getItem());
+            									if(x+1==WinChance.length){
+            										//Randomize and makes sure that the losing items arn't the same
+            										r.nextInt(Mat.length);
+            										if(Fc==3||Fc==2){
+            											i.setItem(new ItemStack(Mat[r.nextInt(Mat.length)]));
+            											Temp.put(Fc, i.getItem());
             										}else{
             											if(Temp.get(3).getType()==Temp.get(2).getType()){
 														i.setItem(ItemSwither.get(Temp.get(2)));
+            											}else{
+                											i.setItem(new ItemStack(Mat[r.nextInt(Mat.length)]));
             											}
             										}
             									}
             								}
             								//Calculate how much to Reward the player and do it
-            								if(Fy==1){
+            								if(Fc==1){
             									if(Win){
             										//if they didn't lose
             										double WinAmount = 0;
@@ -263,14 +272,14 @@ public class SlotPlayerListner implements Listener{
             										EconomyResponse r = CasinoMain.econ.depositPlayer(e.getPlayer().getName(), WinAmount);
             										//Adds money to there account based on the sign
             										e.getPlayer().sendMessage(String.format(""+ChatColor.DARK_GREEN+"Congratulations!"+ChatColor.WHITE+" You won "+ChatColor.YELLOW+"%s!", CasinoMain.econ.format(r.amount)));								
-            										//if(plugin.getConfig().getConfigurationSection("Item"+WinNumber).getBoolean("Jackpot")){
-            										//	plugin.getServer().broadcastMessage(e.getPlayer().getDisplayName()+ChatColor.WHITE+" Just won "+ChatColor.DARK_GREEN+"$"+r.amount+ChatColor.WHITE+" at The Casino!");
-            										//	}
+            										if(plugin.getConfig().getConfigurationSection("SlotMachine").getDouble("AnnounceAmount")<=WinAmount){
+            											plugin.getServer().broadcastMessage(e.getPlayer().getDisplayName()+ChatColor.WHITE+" Just won "+ChatColor.DARK_GREEN+"$"+r.amount+ChatColor.WHITE+" at The Casino!");
+            											}
             									}else{
             										e.getPlayer().sendMessage(""+ChatColor.BLUE+"Better Luck next time");
             									}
             								}
-            							}}, (-30*Fy)+122);
+            							}}, (-30*Fc)+122);
             							//Fires the events at 92 47 32				
             						}
             			}else{
@@ -280,6 +289,7 @@ public class SlotPlayerListner implements Listener{
             			}
             			}
             			}
+            		}
             		}
             		}
             		}
@@ -301,7 +311,7 @@ public class SlotPlayerListner implements Listener{
         				 }
         			 }
         	 }
-         }
+        }
         }
         
         //End of Interact event
